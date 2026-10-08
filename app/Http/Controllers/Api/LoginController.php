@@ -58,6 +58,7 @@ class LoginController extends Controller
         try {
             $user = User::create([
                 'name'     => $request->name,
+                'role_id'  => 5,
                 'email'    => $request->email,
                 'password' => bcrypt($request->password)
             ]);
@@ -67,7 +68,7 @@ class LoginController extends Controller
             $success['token'] = $user->createToken('accessToken')->accessToken;
         } catch (Exception $e) {
             $success['token'] = [];
-            $message          = 'Oops! Unable to create a new user.';
+            $message          = 'Oops! Unable to create a new user.'.$e;
         }
 
         return sendResponse($success, $message);
