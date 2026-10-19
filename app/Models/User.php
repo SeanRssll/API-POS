@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use App\Models\UserModels\Roles;
+use App\Models\UserModels\Permission;
 
 class User extends Authenticatable
 {
@@ -45,16 +47,34 @@ class User extends Authenticatable
     
     public function role()
     {
-        return $this->belongsTo(Role::class);
+        return $this->belongsTo(Roles::class, 'role_id');
     }
 
     public function permissions()
     {
         return $this->belongsToMany(
             Permission::class,
-            'user_permission',
+            'user_permissions',
             'user_id',
             'permission_id'
         )->withTimestamps();
+    }
+
+    public function allPermissions()
+    {
+        $rolePermissions = $this->role
+            ? $this->role->permissions
+            : collect();
+
+        return $rolePermissions
+            ->merge($this->permissions)
+            ->unique('id')
+            ->values();
+    }
+
+    public function hasPermission($permission)
+    {
+        return $this->allPermissions()
+            ->contains('name', $permission);
     }
 }

@@ -17,9 +17,15 @@ use App\Http\Controllers\Api\PostController;
 */
 Route::prefix('v1')->group(function () {
     Route::post('login', [LoginController::class, 'login']);
-    Route::post('register', [LoginController::class, 'register']);
 
     Route::middleware('auth:api')->group(function () {
         Route::resource('posts', PostController::class);
+        Route::middleware([
+            'permission:users.create'
+        ])->post('register', [LoginController::class, 'register']);
     });
+//     permission sample
+//     Route::middleware([
+//     'permission:sales.create,sales.refund'
+// ])->resource('/sales', SaleController::class);
 });

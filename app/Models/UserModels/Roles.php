@@ -4,6 +4,8 @@ namespace App\Models\UserModels;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\UserModels\Permission;
+use App\Models\User;
 
 class Roles extends Model
 {
@@ -12,14 +14,14 @@ class Roles extends Model
     protected $fillable = [
         'name',
         'description',
-        'is_active'
-        ];
+        'is_active',
+    ];
 
     public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(User::class, 'role_id');
     }
-    
+
     public function permissions()
     {
         return $this->belongsToMany(
@@ -29,5 +31,4 @@ class Roles extends Model
             'permission_id'
         )->withTimestamps();
     }
-
 }

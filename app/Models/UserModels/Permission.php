@@ -4,6 +4,8 @@ namespace App\Models\UserModels;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\UserModels\Roles;
+use App\Models\User;
 
 class Permission extends Model
 {
@@ -16,7 +18,7 @@ class Permission extends Model
     public function roles()
     {
         return $this->belongsToMany(
-            Role::class,
+            Roles::class,
             'role_permission',
             'permission_id',
             'role_id'
