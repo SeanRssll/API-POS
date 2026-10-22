@@ -19,10 +19,11 @@ Route::prefix('v1')->group(function () {
     Route::post('login', [LoginController::class, 'login']);
 
     Route::middleware('auth:api')->group(function () {
-        Route::resource('posts', PostController::class);
+        // Route::resource('posts', PostController::class);
         Route::middleware([
             'permission:users.create'
         ])->post('register', [LoginController::class, 'register']);
+        
     });
 //     permission sample
 //     Route::middleware([
