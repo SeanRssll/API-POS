@@ -20,20 +20,23 @@ Route::prefix('v1')->group(function () {
     Route::post('login', [LoginController::class, 'login']);
 
     Route::middleware('auth:api')->group(function () {
-        // Route::resource('posts', PostController::class);
         Route::middleware([
             'permission:users.create'
         ])->post('register', [LoginController::class, 'register']);
         
         Route::middleware([
-            // 'permission:users.assign.role'
              'permission:users.update.role'
         ])->patch('assignRole', [UserController::class, 'assignRole']);
+
+        Route::middleware([
+             'permission:users.remove.role'
+        ])->post('removeRole', [UserController::class, 'removeRole']);
         
         Route::middleware([
             'permission:users.view'
         ])->get('user-dropdown', [UserController::class, 'userDropdown']);
     });
+    // Route::resource('posts', PostController::class);
 //     permission sample
 //     Route::middleware([
 //     'permission:sales.create,sales.refund'

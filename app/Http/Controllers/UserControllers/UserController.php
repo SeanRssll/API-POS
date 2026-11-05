@@ -87,16 +87,31 @@ class UserController extends Controller
         //
     }
 
+    public function userSearch($search){
+        return User::selectRaw("users.*,
+                                TRIM(CONCAT_WS(' ', f_name, m_name, l_name)) AS full_name")
+            ->where('employee_id', $search)
+            ->orWhere('f_name', 'LIKE', "%{$search}%")
+            ->orWhere('m_name', 'LIKE', "%{$search}%")
+            ->orWhere('l_name', 'LIKE', "%{$search}%")
+            ->orWhereRaw(
+                "CONCAT_WS(' ', f_name, m_name, l_name) LIKE ?",
+                ["%{$search}%"]
+            )
+            ->first();
+    }
+
     public function assignRole(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'role_id'       => 'required|integer|exists:roles,id',
-            'id'            => 'required|integer|exists:users,id'
+            'search'        => 'required|string|min:2|max:100'
         ]);
 
         if ($validator->fails()) return sendError('Validation Error.', $validator->errors(), 422);
 
-        $user = User::find($request['id']);
+        // $user = User::find($request['search']);
+        $user = $this->userSearch(trim($request['search']));
         
         if (!$user) {
             return response()->json([
@@ -121,9 +136,8 @@ class UserController extends Controller
             'success' => true,
             'message' => 'Role assigned successfully.',
             'data' => [
-                'user_id' => $user->id,
+                'name' => $user->full_name,
                 'role' => [
-                    'id' => $role->id,
                     'name' => $role->name,
                 ],
             ],
@@ -133,9 +147,15 @@ class UserController extends Controller
     /**
      * Remove a user's current role.
      */
-    public function removeRole(Request $request, $id)
+    public function removeRole(Request $request)
     {
-        $user = User::find($id);
+        $validator = Validator::make($request->all(), [
+            'search'        => 'required|string|min:2|max:100'
+        ]);
+
+        if ($validator->fails()) return sendError('Validation Error.', $validator->errors(), 422);
+
+        $user = $this->userSearch(trim($request['search']));
 
         if (!$user) {
             return response()->json([
@@ -144,7 +164,7 @@ class UserController extends Controller
             ], 404);
         }
 
-        if (!$user->role_id) {
+        if ($user->role_id == 5) {
             return response()->json([
                 'success' => false,
                 'message' => 'User does not have an assigned role.',
@@ -152,15 +172,14 @@ class UserController extends Controller
         }
 
         // Requires users.role_id to be nullable.
-        $user->role_id = null;
+        $user->role_id = 5;
         $user->save();
 
         return response()->json([
             'success' => true,
             'message' => 'Role removed successfully.',
             'data' => [
-                'user_id' => $user->id,
-                'role_id' => null,
+                'full_name' => $user->full_name,
             ],
         ], 200);
     }

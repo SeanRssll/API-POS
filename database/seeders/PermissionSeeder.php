@@ -15,6 +15,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'users.update', 'description' => 'Update users'],
             ['name' => 'users.delete', 'description' => 'Delete users'],
             ['name' => 'users.update.role', 'description' => 'Update users Role'],
+            ['name' => 'users.remove.role', 'description' => 'Remove users Role'],
             
             ['name' => 'products.view', 'description' => 'View products'],
             ['name' => 'products.create', 'description' => 'Create products'],
