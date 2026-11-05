@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\PostController;
+use App\Http\Controllers\UserControllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +25,14 @@ Route::prefix('v1')->group(function () {
             'permission:users.create'
         ])->post('register', [LoginController::class, 'register']);
         
+        Route::middleware([
+            // 'permission:users.assign.role'
+             'permission:users.update.role'
+        ])->patch('assignRole', [UserController::class, 'assignRole']);
+        
+        Route::middleware([
+            'permission:users.view'
+        ])->get('user-dropdown', [UserController::class, 'userDropdown']);
     });
 //     permission sample
 //     Route::middleware([
